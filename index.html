@@ -3387,6 +3387,9 @@ function openTaskDetail(taskId) {
       ${createdDate ? `<div class="task-detail-timestamp">Created: ${createdDate}</div>` : ''}
       ${task.status === 'Done' && completedDate ? `<div class="task-detail-timestamp">Completed: ${completedDate}</div>` : ''}
     </div>
+    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--gray-100);">
+      <button class="btn-primary" onclick="closeTaskDetail()" style="width: 100%; padding: 14px; font-size: 0.95rem;">Finished</button>
+    </div>
   `;
 
   document.getElementById('taskDetailOverlay').classList.add('active');
