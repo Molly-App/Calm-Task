@@ -1561,22 +1561,22 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: 6px 4px;
+    gap: 3px;
+    padding: 10px 4px;
     background: none;
     border: none;
     cursor: pointer;
     color: var(--gray-400);
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-family: var(--font);
     font-weight: 500;
-    min-width: 56px;
+    flex: 1;
     transition: color var(--transition);
   }
 
   .bottom-tab svg {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
   }
 
   .bottom-tab.active {
@@ -2230,7 +2230,8 @@ async function initApp() {
   try {
     await refreshData();
     buildNav();
-    switchTab('donext');
+    const isMobile = window.innerWidth <= 768;
+    switchTab(isMobile ? 'inbox' : 'donext');
   } catch (err) {
     console.error('initApp failed:', err);
     _appInitialized = false;
@@ -2350,9 +2351,11 @@ function buildNav() {
 
   sidebar.innerHTML = sidebarHtml;
 
-  // Bottom tabs: include sub-views in a flat list for mobile (exclude Settings)
-  const BOTTOM_TABS = TABS.filter(t => t.id !== 'settings');
-  bottomTabs.innerHTML = BOTTOM_TABS.map(t => `
+  // Bottom tabs: mobile only — Inbox + Do Next
+  bottomTabs.innerHTML = [
+    { id: 'inbox', label: 'Inbox', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 12h5l2 3h2l2-3h5"/></svg>` },
+    { id: 'donext', label: 'Do Next', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>` },
+  ].map(t => `
     <button class="bottom-tab ${t.id === currentTab ? 'active' : ''}" data-tab="${t.id}">
       ${t.icon}
       <span>${t.label}</span>
