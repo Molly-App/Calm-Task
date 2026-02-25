@@ -1707,6 +1707,152 @@ body {
   margin-top: 12px;
   min-height: 20px;
 }
+
+/* Settings */
+.settings-section {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.settings-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal-deep);
+  margin-bottom: 16px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-label {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.settings-field {
+  margin-bottom: 12px;
+}
+
+.settings-current-value {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  padding: 8px 0;
+}
+
+.settings-message {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  min-height: 20px;
+  color: var(--teal-deep);
+}
+
+.settings-message.error {
+  color: var(--amber);
+}
+
+/* Dark Mode Toggle Switch */
+.dark-mode-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-track {
+  display: block;
+  width: 44px;
+  height: 24px;
+  background: var(--gray-300);
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.toggle-track .toggle-thumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: var(--white);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.dark-mode-toggle.active .toggle-track {
+  background: var(--teal);
+}
+
+.dark-mode-toggle.active .toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+body.dark-mode {
+  --gray-50: #1a1b1e;
+  --gray-100: #25262b;
+  --gray-200: #2c2e33;
+  --gray-300: #373a40;
+  --gray-400: #5c5f66;
+  --gray-500: #909296;
+  --gray-700: #c1c2c5;
+  --gray-900: #e4e5e7;
+  --white: #1f2023;
+  --teal-wash: #1a2e2b;
+  --teal-subtle: #1e3533;
+  --amber-subtle: #2e2a1e;
+}
+
+body.dark-mode .sidebar {
+  background: #1f2023;
+  border-right-color: #2c2e33;
+}
+
+body.dark-mode .auth-screen {
+  background: #1a1b1e;
+}
+
+body.dark-mode .auth-container {
+  background: #1f2023;
+}
+
+body.dark-mode .inbox-input,
+body.dark-mode .form-input,
+body.dark-mode .form-select,
+body.dark-mode .add-task-input,
+body.dark-mode .task-status-select,
+body.dark-mode .task-detail-name-input,
+body.dark-mode .task-detail-notes,
+body.dark-mode .project-notes,
+body.dark-mode .auth-input {
+  background: #25262b;
+  border-color: #373a40;
+  color: #e4e5e7;
+}
+
+body.dark-mode .project-detail-panel,
+body.dark-mode .task-detail-panel,
+body.dark-mode .assign-modal {
+  background: #1f2023;
+}
+
+body.dark-mode .bottom-tabs {
+  background: #1f2023;
+  border-top-color: #2c2e33;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1896,6 +2042,60 @@ body {
       </div>
       <div class="review-flow" id="reviewFlow">
         <div id="reviewFlowContent"></div>
+      </div>
+    </div>
+
+    <div class="tab-view" id="tab-settings">
+      <div class="page-header">
+        <h2>Settings</h2>
+        <p>Account and display preferences.</p>
+      </div>
+
+      <!-- Dark Mode Toggle -->
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-row">
+          <span class="settings-label">Dark Mode</span>
+          <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()">
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Change Email -->
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-field">
+          <label class="form-label">Current Email</label>
+          <div class="settings-current-value" id="settingsCurrentEmail"></div>
+        </div>
+        <div class="settings-field">
+          <label class="form-label">New Email</label>
+          <input type="email" class="form-input" id="settingsNewEmail" placeholder="Enter new email address">
+        </div>
+        <div class="settings-field">
+          <button class="btn-primary" id="changeEmailBtn" onclick="changeEmail()">Update Email</button>
+          <p class="settings-message" id="emailMessage"></p>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="settings-section">
+        <div class="settings-section-title">Password</div>
+        <div class="settings-field">
+          <label class="form-label">New Password</label>
+          <input type="password" class="form-input" id="settingsNewPassword" placeholder="Enter new password (min 6 characters)">
+        </div>
+        <div class="settings-field">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" class="form-input" id="settingsConfirmPassword" placeholder="Confirm new password">
+        </div>
+        <div class="settings-field">
+          <button class="btn-primary" id="changePasswordBtn" onclick="changePassword()">Update Password</button>
+          <p class="settings-message" id="passwordMessage"></p>
+        </div>
       </div>
     </div>
 
@@ -2099,6 +2299,7 @@ const TABS = [
   { id: 'projects',  label: 'Projects',     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4m0 0l9-4m-9 4v10"/></svg>` },
   { id: 'overloaded',label: 'Overloaded?',  icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 16v.01M12 8v4"/></svg>` },
   { id: 'review',    label: 'Review',       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>` },
+  { id: 'settings',  label: 'Settings',     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>` },
 ];
 
 const DO_NEXT_SUBS = [
@@ -2149,8 +2350,8 @@ function buildNav() {
 
   sidebar.innerHTML = sidebarHtml;
 
-  // Bottom tabs: include sub-views in a flat list for mobile
-  const BOTTOM_TABS = TABS;
+  // Bottom tabs: include sub-views in a flat list for mobile (exclude Settings)
+  const BOTTOM_TABS = TABS.filter(t => t.id !== 'settings');
   bottomTabs.innerHTML = BOTTOM_TABS.map(t => `
     <button class="bottom-tab ${t.id === currentTab ? 'active' : ''}" data-tab="${t.id}">
       ${t.icon}
@@ -2182,6 +2383,7 @@ function renderCurrentTab() {
     case 'projects': renderProjects(); break;
     case 'overloaded': renderOverloaded(); break;
     case 'review': /* static until started */ break;
+    case 'settings': renderSettings(); break;
   }
 }
 
@@ -3289,6 +3491,98 @@ function timeAgo(ts) {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   return `${days}d ago`;
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+function renderSettings() {
+  // Show current email
+  const emailEl = document.getElementById('settingsCurrentEmail');
+  if (emailEl) {
+    sb.auth.getUser().then(({ data }) => {
+      if (data?.user?.email) emailEl.textContent = data.user.email;
+    });
+  }
+  // Restore dark mode toggle state
+  const toggle = document.getElementById('darkModeToggle');
+  if (toggle) {
+    if (document.body.classList.contains('dark-mode')) {
+      toggle.classList.add('active');
+    } else {
+      toggle.classList.remove('active');
+    }
+  }
+}
+
+async function changeEmail() {
+  const newEmail = document.getElementById('settingsNewEmail').value.trim();
+  const msgEl = document.getElementById('emailMessage');
+  msgEl.textContent = '';
+  msgEl.className = 'settings-message';
+
+  if (!newEmail) {
+    msgEl.textContent = 'Please enter a new email address.';
+    msgEl.className = 'settings-message error';
+    return;
+  }
+
+  const { error } = await sb.auth.updateUser({ email: newEmail });
+  if (error) {
+    msgEl.textContent = error.message;
+    msgEl.className = 'settings-message error';
+  } else {
+    msgEl.textContent = 'Confirmation sent to both old and new email. Check your inbox.';
+    document.getElementById('settingsNewEmail').value = '';
+  }
+}
+
+async function changePassword() {
+  const newPass = document.getElementById('settingsNewPassword').value;
+  const confirmPass = document.getElementById('settingsConfirmPassword').value;
+  const msgEl = document.getElementById('passwordMessage');
+  msgEl.textContent = '';
+  msgEl.className = 'settings-message';
+
+  if (!newPass || !confirmPass) {
+    msgEl.textContent = 'Please fill in both fields.';
+    msgEl.className = 'settings-message error';
+    return;
+  }
+  if (newPass.length < 6) {
+    msgEl.textContent = 'Password must be at least 6 characters.';
+    msgEl.className = 'settings-message error';
+    return;
+  }
+  if (newPass !== confirmPass) {
+    msgEl.textContent = 'Passwords do not match.';
+    msgEl.className = 'settings-message error';
+    return;
+  }
+
+  const { error } = await sb.auth.updateUser({ password: newPass });
+  if (error) {
+    msgEl.textContent = error.message;
+    msgEl.className = 'settings-message error';
+  } else {
+    msgEl.textContent = 'Password updated successfully.';
+    document.getElementById('settingsNewPassword').value = '';
+    document.getElementById('settingsConfirmPassword').value = '';
+  }
+}
+
+function toggleDarkMode() {
+  const toggle = document.getElementById('darkModeToggle');
+  document.body.classList.toggle('dark-mode');
+  toggle.classList.toggle('active');
+  // Persist preference
+  localStorage.setItem('calm-tasks-dark-mode', document.body.classList.contains('dark-mode') ? 'true' : 'false');
+}
+
+// Apply dark mode on load
+if (localStorage.getItem('calm-tasks-dark-mode') === 'true') {
+  document.body.classList.add('dark-mode');
 }
 
 /* ============================================================
