@@ -900,6 +900,13 @@ body {
 
 .add-task-btn:hover { background: var(--teal-deep); }
 
+.add-task-btn:disabled,
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Add project button */
 .add-project-section {
   margin-bottom: 24px;
@@ -2555,7 +2562,7 @@ body.dark-mode .toast-notification {
         <div class="add-project-form" id="addProjectForm">
           <div class="form-row">
             <label class="form-label">Project Name</label>
-            <input type="text" class="form-input" id="newProjectName" placeholder="e.g., ENG 204 or Kitchen remodel">
+            <input type="text" class="form-input" id="newProjectName" placeholder="e.g., ENG 204 or Kitchen remodel" oninput="document.getElementById('saveProjectBtn').disabled = !this.value.trim();">
           </div>
           <div class="form-row">
             <label class="form-label">Bucket</label>
@@ -2576,7 +2583,7 @@ body.dark-mode .toast-notification {
           </div>
           <div class="form-actions">
             <button class="btn-secondary" id="cancelProjectBtn">Cancel</button>
-            <button class="btn-primary" id="saveProjectBtn">Create Project</button>
+            <button class="btn-primary" id="saveProjectBtn" disabled>Create Project</button>
           </div>
         </div>
       </div>
@@ -3880,7 +3887,7 @@ function openProjectDetail(projectId) {
     </div>
 
     <div class="add-task-form-block">
-      <input type="text" class="add-task-input" id="newTaskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTaskToProject('${projectId}')" style="width:100%; margin-bottom:8px;">
+      <input type="text" class="add-task-input" id="newTaskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTaskToProject('${projectId}')" oninput="document.getElementById('addTaskBtn').disabled = !this.value.trim();" style="width:100%; margin-bottom:8px;">
       <div style="display:flex; gap:8px; align-items:center;">
         <select class="task-status-select" id="newTaskEnergy" style="width:auto;">
           <option value="">Energy?</option>
@@ -3896,7 +3903,7 @@ function openProjectDetail(projectId) {
           <option value="Errand">🚗 Errand</option>
           <option value="Reading">📖 Reading</option>
         </select>
-        <button class="add-task-btn" onclick="addTaskToProject('${projectId}')">Add</button>
+        <button class="add-task-btn" id="addTaskBtn" onclick="addTaskToProject('${projectId}')" disabled>Add</button>
       </div>
     </div>
 
@@ -4345,7 +4352,8 @@ function openTaskDetail(taskId) {
       </div>
       <div class="task-detail-field">
         <span class="task-detail-field-label">Context</span>
-        <select id="taskDetailContext" onchange="saveTaskDetailField('${taskId}', 'context', this.value)">
+        <span id="taskDetailContextIcon" style="flex-shrink:0;">${contextIcon(task.context)}</span>
+        <select id="taskDetailContext" onchange="saveTaskDetailField('${taskId}', 'context', this.value); document.getElementById('taskDetailContextIcon').innerHTML = contextIcon(this.value);">
           ${CONTEXT_OPTIONS.map(c => `<option value="${c}" ${(task.context||'')===c?'selected':''}>${c || '—'}</option>`).join('')}
         </select>
       </div>
