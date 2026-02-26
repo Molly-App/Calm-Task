@@ -2708,10 +2708,11 @@ const ENERGY_ICONS = {
   'Low':    { src: 'Green Brain.png',  label: 'Low energy' },
   'Medium': { src: 'Yellow Brain.png', label: 'Medium energy' },
   'High':   { src: 'Purple Brain.png', label: 'High energy' },
+  '':       { src: 'Unassigned_Brain.png', label: 'No energy set' },
 };
 
 function energyIcon(level, size) {
-  const info = ENERGY_ICONS[level];
+  const info = ENERGY_ICONS[level] || ENERGY_ICONS[''];
   if (!info) return '';
   const s = size || 20;
   return `<img class="energy-brain" src="${info.src}" alt="${info.label}" title="${info.label}" width="${s}" height="${s}">`;
@@ -3912,6 +3913,7 @@ function renderOverloaded() {
         lowCount: pTasks.filter(t => t.energy === 'Low').length,
         medCount: pTasks.filter(t => t.energy === 'Medium').length,
         highCount: pTasks.filter(t => t.energy === 'High').length,
+        unassignedCount: pTasks.filter(t => !t.energy).length,
       };
     }).sort((a, b) => b.taskCount - a.taskCount);
 
@@ -3931,6 +3933,7 @@ function renderOverloaded() {
             if (p.lowCount) breakdown += `<span class="energy-count">${p.lowCount}${energyIcon('Low', 16)}</span>`;
             if (p.medCount) breakdown += `<span class="energy-count">${p.medCount}${energyIcon('Medium', 16)}</span>`;
             if (p.highCount) breakdown += `<span class="energy-count">${p.highCount}${energyIcon('High', 16)}</span>`;
+            if (p.unassignedCount) breakdown += `<span class="energy-count">${p.unassignedCount}${energyIcon('', 16)}</span>`;
             return `
             <div class="overloaded-project-row">
               <span>${escHtml(p.name)}</span>
