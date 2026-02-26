@@ -2405,6 +2405,43 @@ body.dark-mode .toast-notification {
   background: #e4e5e7;
   color: #1a1b1e;
 }
+
+/* Mobile dark mode toggle — top right corner, phone only */
+.mobile-dark-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-dark-toggle {
+    display: flex;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 99;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-dark-toggle:hover {
+    box-shadow: var(--shadow);
+  }
+}
+
+body.dark-mode .mobile-dark-toggle {
+  background: #25262b;
+  border-color: #373a40;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -2444,6 +2481,7 @@ body.dark-mode .toast-notification {
 
   <!-- Main Content -->
   <main class="main" id="mainContent">
+    <button class="mobile-dark-toggle" id="mobileDarkToggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙</button>
 
     <!-- ==================== INBOX ==================== -->
     <div class="tab-view" id="tab-inbox">
@@ -4563,12 +4601,18 @@ function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   toggle.classList.toggle('active');
   // Persist preference
-  localStorage.setItem('calm-tasks-dark-mode', document.body.classList.contains('dark-mode') ? 'true' : 'false');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('calm-tasks-dark-mode', isDark ? 'true' : 'false');
+  // Sync mobile toggle icon
+  const mobileToggle = document.getElementById('mobileDarkToggle');
+  if (mobileToggle) mobileToggle.textContent = isDark ? '☀️' : '🌙';
 }
 
 // Apply dark mode on load
 if (localStorage.getItem('calm-tasks-dark-mode') === 'true') {
   document.body.classList.add('dark-mode');
+  const mobileToggle = document.getElementById('mobileDarkToggle');
+  if (mobileToggle) mobileToggle.textContent = '☀️';
 }
 
 /* ============================================================
