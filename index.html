@@ -3083,8 +3083,8 @@ async function assignInboxToProject(projectId) {
   await sb.from('tasks').insert({ name: taskName, project_id: projectId, status: 'Next' });
   await sb.from('inbox_items').delete().eq('id', assigningItemId);
   assigningItemId = null;
-  document.getElementById('assignModal').classList.remove('active');
   await refreshData();
+  document.getElementById('assignModal').classList.remove('active');
   renderInbox();
 }
 
