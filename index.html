@@ -572,6 +572,48 @@ body {
   object-fit: contain;
 }
 
+/* Context tag emoji on task cards */
+.context-tag {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Context filter bar */
+.context-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.context-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-family: var(--font);
+  font-weight: 500;
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.context-filter:hover {
+  border-color: var(--gray-300);
+  background: var(--gray-50);
+}
+
+.context-filter.active {
+  background: var(--teal);
+  color: var(--white);
+  border-color: var(--teal);
+}
+
 .task-status-select {
   font-size: 0.72rem;
   font-family: var(--font);
@@ -2011,6 +2053,15 @@ body {
     font-size: 0.75rem;
   }
 
+  .context-filters {
+    gap: 6px;
+  }
+
+  .context-filter {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+  }
+
   .project-detail-overlay {
     padding: 20px 12px;
   }
@@ -2412,6 +2463,14 @@ body.dark-mode .toast-notification {
         <button class="energy-filter" data-energy="Medium"><img class="energy-brain" src="Yellow Brain.png" alt="Medium energy" title="Medium energy" width="16" height="16"> Medium</button>
         <button class="energy-filter" data-energy="High"><img class="energy-brain" src="Purple Brain.png" alt="High energy" title="High energy" width="16" height="16"> High</button>
       </div>
+      <div class="context-filters" id="contextFilters">
+        <button class="context-filter active" data-context="all">All</button>
+        <button class="context-filter" data-context="Computer">💻 Computer</button>
+        <button class="context-filter" data-context="Email">📧 Email</button>
+        <button class="context-filter" data-context="Meeting">🤝 Meeting</button>
+        <button class="context-filter" data-context="Errand">🚗 Errand</button>
+        <button class="context-filter" data-context="Reading">📖 Reading</button>
+      </div>
       <div id="doNextContent"></div>
     </div>
 
@@ -2426,6 +2485,14 @@ body.dark-mode .toast-notification {
         <button class="energy-filter" data-energy="Low"><img class="energy-brain" src="Green Brain.png" alt="Low energy" title="Low energy" width="16" height="16"> Low</button>
         <button class="energy-filter" data-energy="Medium"><img class="energy-brain" src="Yellow Brain.png" alt="Medium energy" title="Medium energy" width="16" height="16"> Medium</button>
         <button class="energy-filter" data-energy="High"><img class="energy-brain" src="Purple Brain.png" alt="High energy" title="High energy" width="16" height="16"> High</button>
+      </div>
+      <div class="context-filters" id="waitingContextFilters">
+        <button class="context-filter active" data-context="all">All</button>
+        <button class="context-filter" data-context="Computer">💻 Computer</button>
+        <button class="context-filter" data-context="Email">📧 Email</button>
+        <button class="context-filter" data-context="Meeting">🤝 Meeting</button>
+        <button class="context-filter" data-context="Errand">🚗 Errand</button>
+        <button class="context-filter" data-context="Reading">📖 Reading</button>
       </div>
       <div id="waitingContent"></div>
     </div>
@@ -2442,6 +2509,14 @@ body.dark-mode .toast-notification {
         <button class="energy-filter" data-energy="Medium"><img class="energy-brain" src="Yellow Brain.png" alt="Medium energy" title="Medium energy" width="16" height="16"> Medium</button>
         <button class="energy-filter" data-energy="High"><img class="energy-brain" src="Purple Brain.png" alt="High energy" title="High energy" width="16" height="16"> High</button>
       </div>
+      <div class="context-filters" id="somedayContextFilters">
+        <button class="context-filter active" data-context="all">All</button>
+        <button class="context-filter" data-context="Computer">💻 Computer</button>
+        <button class="context-filter" data-context="Email">📧 Email</button>
+        <button class="context-filter" data-context="Meeting">🤝 Meeting</button>
+        <button class="context-filter" data-context="Errand">🚗 Errand</button>
+        <button class="context-filter" data-context="Reading">📖 Reading</button>
+      </div>
       <div id="somedayContent"></div>
     </div>
 
@@ -2456,6 +2531,14 @@ body.dark-mode .toast-notification {
         <button class="energy-filter" data-energy="Low"><img class="energy-brain" src="Green Brain.png" alt="Low energy" title="Low energy" width="16" height="16"> Low</button>
         <button class="energy-filter" data-energy="Medium"><img class="energy-brain" src="Yellow Brain.png" alt="Medium energy" title="Medium energy" width="16" height="16"> Medium</button>
         <button class="energy-filter" data-energy="High"><img class="energy-brain" src="Purple Brain.png" alt="High energy" title="High energy" width="16" height="16"> High</button>
+      </div>
+      <div class="context-filters" id="doneContextFilters">
+        <button class="context-filter active" data-context="all">All</button>
+        <button class="context-filter" data-context="Computer">💻 Computer</button>
+        <button class="context-filter" data-context="Email">📧 Email</button>
+        <button class="context-filter" data-context="Meeting">🤝 Meeting</button>
+        <button class="context-filter" data-context="Errand">🚗 Errand</button>
+        <button class="context-filter" data-context="Reading">📖 Reading</button>
       </div>
       <div id="doneContent"></div>
     </div>
@@ -2711,11 +2794,24 @@ const ENERGY_ICONS = {
   '':       { src: 'Unassigned_Brain.png', label: 'No energy set' },
 };
 
+const CONTEXT_ICONS = {
+  'Computer': '💻',
+  'Email':    '📧',
+  'Meeting':  '🤝',
+  'Errand':   '🚗',
+  'Reading':  '📖',
+};
+
 function energyIcon(level, size) {
   const info = ENERGY_ICONS[level] || ENERGY_ICONS[''];
   if (!info) return '';
   const s = size || 20;
   return `<img class="energy-brain" src="${info.src}" alt="${info.label}" title="${info.label}" width="${s}" height="${s}">`;
+}
+
+function contextIcon(ctx) {
+  if (!ctx || !CONTEXT_ICONS[ctx]) return '';
+  return `<span class="context-tag" title="${ctx}">${CONTEXT_ICONS[ctx]}</span>`;
 }
 
 function energyTag(level) {
@@ -2914,9 +3010,9 @@ function renderCurrentTab() {
   switch (currentTab) {
     case 'inbox': renderInbox(); break;
     case 'donext': renderDoNext(); break;
-    case 'waiting': renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter); break;
-    case 'someday': renderStatusView('Someday', 'somedayContent', somedayEnergyFilter); break;
-    case 'done': renderStatusView('Done', 'doneContent', doneEnergyFilter); break;
+    case 'waiting': renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter); break;
+    case 'someday': renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter); break;
+    case 'done': renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter); break;
     case 'projects': renderProjects(); break;
     case 'overloaded': renderOverloaded(); break;
     case 'review': /* static until started */ break;
@@ -3324,12 +3420,22 @@ function showToast(message, duration) {
    ============================================================ */
 
 let energyFilter = 'all';
+let contextFilter = 'all';
 
 document.getElementById('energyFilters').addEventListener('click', e => {
   const btn = e.target.closest('.energy-filter');
   if (!btn) return;
   energyFilter = btn.dataset.energy;
-  document.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#energyFilters .energy-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDoNext();
+});
+
+document.getElementById('contextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  contextFilter = btn.dataset.context;
+  document.querySelectorAll('#contextFilters .context-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderDoNext();
 });
@@ -3352,10 +3458,15 @@ function renderDoNext() {
   const container = document.getElementById('doNextContent');
   const weeklyPicks = new Set(_weeklyPicks.map(p => p.task_id));
 
-  const filtered = energyFilter === 'all' ? tasks : tasks.filter(t => t.energy === energyFilter);
+  let filtered = energyFilter === 'all' ? tasks : tasks.filter(t => t.energy === energyFilter);
+  if (contextFilter !== 'all') filtered = filtered.filter(t => t.context === contextFilter);
 
   if (!filtered.length) {
-    container.innerHTML = `<div class="empty-state">${energyFilter === 'all' ? 'No active tasks yet. Add some from the Projects tab.' : 'No ' + energyFilter.toLowerCase() + ' tasks right now.'}</div>`;
+    let emptyMsg = 'No active tasks yet. Add some from the Projects tab.';
+    if (energyFilter !== 'all' || contextFilter !== 'all') {
+      emptyMsg = 'No tasks match the current filters.';
+    }
+    container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
     return;
   }
 
@@ -3388,6 +3499,7 @@ function renderDoNext() {
             <div class="task-name-row">
               <div class="task-name">${escHtml(task.name)}</div>
               ${energyIcon(task.energy, 20)}
+              ${contextIcon(task.context)}
             </div>
             <div class="task-meta">
               <span class="task-project-tag">${proj ? escHtml(proj.name) : ''}</span>
@@ -3440,6 +3552,9 @@ async function changeTaskStatus(taskId, newStatus) {
 let waitingEnergyFilter = 'all';
 let somedayEnergyFilter = 'all';
 let doneEnergyFilter = 'all';
+let waitingContextFilter = 'all';
+let somedayContextFilter = 'all';
+let doneContextFilter = 'all';
 
 // Collapsible bucket state per status view (all expanded by default)
 const openWaitingBuckets = new Set(BUCKETS);
@@ -3465,7 +3580,16 @@ document.getElementById('waitingEnergyFilters').addEventListener('click', e => {
   waitingEnergyFilter = btn.dataset.energy;
   e.currentTarget.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter);
+  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter);
+});
+
+document.getElementById('waitingContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  waitingContextFilter = btn.dataset.context;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter);
 });
 
 document.getElementById('somedayEnergyFilters').addEventListener('click', e => {
@@ -3474,7 +3598,16 @@ document.getElementById('somedayEnergyFilters').addEventListener('click', e => {
   somedayEnergyFilter = btn.dataset.energy;
   e.currentTarget.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter);
+  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter);
+});
+
+document.getElementById('somedayContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  somedayContextFilter = btn.dataset.context;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter);
 });
 
 document.getElementById('doneEnergyFilters').addEventListener('click', e => {
@@ -3483,10 +3616,19 @@ document.getElementById('doneEnergyFilters').addEventListener('click', e => {
   doneEnergyFilter = btn.dataset.energy;
   e.currentTarget.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Done', 'doneContent', doneEnergyFilter);
+  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter);
 });
 
-function renderStatusView(status, containerId, energyFilter) {
+document.getElementById('doneContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  doneContextFilter = btn.dataset.context;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter);
+});
+
+function renderStatusView(status, containerId, energyFilter, contextFilter) {
   let tasks = getTasks().filter(t => t.status === status);
   const projects = getProjects();
   const container = document.getElementById(containerId);
@@ -3497,7 +3639,8 @@ function renderStatusView(status, containerId, energyFilter) {
     tasks.sort((a, b) => (new Date(b.completed_at || 0)) - (new Date(a.completed_at || 0)));
   }
 
-  const filtered = energyFilter === 'all' ? tasks : tasks.filter(t => t.energy === energyFilter);
+  let filtered = energyFilter === 'all' ? tasks : tasks.filter(t => t.energy === energyFilter);
+  if (contextFilter && contextFilter !== 'all') filtered = filtered.filter(t => t.context === contextFilter);
 
   if (!filtered.length) {
     const emptyMsg = status === 'Done'
@@ -3540,6 +3683,7 @@ function renderStatusView(status, containerId, energyFilter) {
             <div class="task-name-row">
               <div class="task-name ${status === 'Done' ? 'done' : ''}">${escHtml(task.name)}</div>
               ${energyIcon(task.energy, 20)}
+              ${contextIcon(task.context)}
             </div>
             <div class="task-meta">
               <span class="task-project-tag">${proj ? escHtml(proj.name) : ''}</span>
@@ -3707,6 +3851,7 @@ function openProjectDetail(projectId) {
             <div class="task-name-row">
               <div class="task-name ${t.status === 'Done' ? 'done' : ''}">${escHtml(t.name)}</div>
               ${energyIcon(t.energy, 20)}
+              ${contextIcon(t.context)}
             </div>
           </div>
           <select class="task-status-select" onclick="event.stopPropagation()" onchange="changeTaskStatusFromDetail('${t.id}', this.value, '${projectId}')">
@@ -3726,7 +3871,7 @@ function openProjectDetail(projectId) {
     <div class="project-detail-bucket">${project.bucket}</div>
 
     <div class="project-detail-status">
-      <div class="project-detail-status-label">Status</div>
+      <div class="project-detail-status-label">Project Status</div>
       <select onchange="changeProjectStatus('${projectId}', this.value)">
         <option value="Active" ${project.status==='Active'?'selected':''}>Active</option>
         <option value="Paused" ${project.status==='Paused'?'selected':''}>Paused</option>
@@ -3734,15 +3879,25 @@ function openProjectDetail(projectId) {
       </select>
     </div>
 
-    <div class="add-task-row">
-      <input type="text" class="add-task-input" id="newTaskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTaskToProject('${projectId}')">
-      <select class="task-status-select" id="newTaskEnergy" style="width:auto;">
-        <option value="">Energy?</option>
-        <option value="Low">🟢 Low</option>
-        <option value="Medium">🟡 Medium</option>
-        <option value="High">🟣 High</option>
-      </select>
-      <button class="add-task-btn" onclick="addTaskToProject('${projectId}')">Add</button>
+    <div class="add-task-form-block">
+      <input type="text" class="add-task-input" id="newTaskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTaskToProject('${projectId}')" style="width:100%; margin-bottom:8px;">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <select class="task-status-select" id="newTaskEnergy" style="width:auto;">
+          <option value="">Energy?</option>
+          <option value="Low">🟢 Low</option>
+          <option value="Medium">🟡 Medium</option>
+          <option value="High">🟣 High</option>
+        </select>
+        <select class="task-status-select" id="newTaskContext" style="width:auto;">
+          <option value="">Context?</option>
+          <option value="Computer">💻 Computer</option>
+          <option value="Email">📧 Email</option>
+          <option value="Meeting">🤝 Meeting</option>
+          <option value="Errand">🚗 Errand</option>
+          <option value="Reading">📖 Reading</option>
+        </select>
+        <button class="add-task-btn" onclick="addTaskToProject('${projectId}')">Add</button>
+      </div>
     </div>
 
     <div class="project-notes-display" id="projectNotesDisplay" onclick="projectNotesStartEdit('${projectId}')">${linkifyNotes(project.notes || '')}</div>
@@ -3804,10 +3959,13 @@ document.getElementById('projectDetailOverlay').addEventListener('click', e => {
 async function addTaskToProject(projectId) {
   const input = document.getElementById('newTaskInput');
   const energySel = document.getElementById('newTaskEnergy');
+  const contextSel = document.getElementById('newTaskContext');
   const name = input.value.trim();
   if (!name) return;
 
-  await sb.from('tasks').insert({ name, project_id: projectId, status: 'Next', energy: energySel.value || '' });
+  const energy = energySel.value;
+  const context = contextSel.value;
+  await sb.from('tasks').insert({ name, project_id: projectId, status: 'Next', energy: energy || null, context: context || null });
   await refreshData();
   openProjectDetail(projectId); // re-render
 }
@@ -3914,6 +4072,11 @@ function renderOverloaded() {
         medCount: pTasks.filter(t => t.energy === 'Medium').length,
         highCount: pTasks.filter(t => t.energy === 'High').length,
         unassignedCount: pTasks.filter(t => !t.energy).length,
+        computerCount: pTasks.filter(t => t.context === 'Computer').length,
+        emailCount: pTasks.filter(t => t.context === 'Email').length,
+        meetingCount: pTasks.filter(t => t.context === 'Meeting').length,
+        errandCount: pTasks.filter(t => t.context === 'Errand').length,
+        readingCount: pTasks.filter(t => t.context === 'Reading').length,
       };
     }).sort((a, b) => b.taskCount - a.taskCount);
 
@@ -3934,12 +4097,20 @@ function renderOverloaded() {
             if (p.medCount) breakdown += `<span class="energy-count">${p.medCount}${energyIcon('Medium', 16)}</span>`;
             if (p.highCount) breakdown += `<span class="energy-count">${p.highCount}${energyIcon('High', 16)}</span>`;
             if (p.unassignedCount) breakdown += `<span class="energy-count">${p.unassignedCount}${energyIcon('', 16)}</span>`;
+
+            let ctxBreakdown = '';
+            if (p.computerCount) ctxBreakdown += `<span class="energy-count">${p.computerCount} 💻</span>`;
+            if (p.emailCount) ctxBreakdown += `<span class="energy-count">${p.emailCount} 📧</span>`;
+            if (p.meetingCount) ctxBreakdown += `<span class="energy-count">${p.meetingCount} 🤝</span>`;
+            if (p.errandCount) ctxBreakdown += `<span class="energy-count">${p.errandCount} 🚗</span>`;
+            if (p.readingCount) ctxBreakdown += `<span class="energy-count">${p.readingCount} 📖</span>`;
             return `
             <div class="overloaded-project-row">
               <span>${escHtml(p.name)}</span>
               <span class="task-count-group">
                 <span class="task-count">${p.taskCount}</span>
                 ${breakdown ? `<span class="energy-breakdown">${breakdown}</span>` : ''}
+                ${ctxBreakdown ? `<span class="energy-breakdown" style="border-left-color:var(--gray-200);">${ctxBreakdown}</span>` : ''}
               </span>
             </div>
           `}).join('')}
@@ -4043,6 +4214,7 @@ function renderReviewStep() {
                 <div class="task-name-row">
                   <div class="task-name">${escHtml(t.name)}</div>
                   ${energyIcon(t.energy, 20)}
+                  ${contextIcon(t.context)}
                 </div>
                 <div class="task-meta">
                   <span class="task-project-tag">${proj ? escHtml(proj.name) : ''}</span>
