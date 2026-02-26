@@ -1205,11 +1205,21 @@ body {
 
 .assign-modal .assign-item-preview {
   font-size: 0.85rem;
-  color: var(--gray-500);
+  color: var(--gray-900);
   margin-bottom: 16px;
   padding: 8px 12px;
   background: var(--gray-50);
+  border: 1px solid var(--gray-200);
   border-radius: var(--radius-sm);
+  width: 100%;
+  font-family: var(--font);
+  transition: border-color var(--transition);
+}
+
+.assign-modal .assign-item-preview:focus {
+  outline: none;
+  border-color: var(--teal-light);
+  background: var(--white);
 }
 
 .assign-project-list {
@@ -1344,6 +1354,344 @@ body {
   padding: 40px 20px;
   color: var(--gray-400);
   font-size: 0.9rem;
+}
+
+/* ============================================
+   INBOX TASK/NOTE CHOICE POPUP
+   ============================================ */
+.inbox-choice-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 650;
+  justify-content: center;
+  align-items: center;
+}
+
+.inbox-choice-overlay.active { display: flex; }
+
+.inbox-choice-modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
+
+.inbox-choice-text {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  word-break: break-word;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.inbox-choice-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.inbox-choice-btn {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  font-family: var(--font);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.inbox-choice-btn.task-btn {
+  background: var(--teal);
+  color: var(--white);
+  border: 1.5px solid var(--teal);
+}
+
+.inbox-choice-btn.task-btn:hover {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+}
+
+.inbox-choice-btn.note-btn {
+  background: var(--white);
+  color: var(--teal-deep);
+  border: 1.5px solid var(--teal-light);
+}
+
+.inbox-choice-btn.note-btn:hover {
+  background: var(--teal-wash);
+  border-color: var(--teal);
+}
+
+/* ============================================
+   NOTE PICKER MODAL (Bucket → Project → Task)
+   ============================================ */
+.note-picker-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 660;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 16px;
+}
+
+.note-picker-overlay.active { display: flex; }
+
+.note-picker-modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 440px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.note-picker-header {
+  padding: 20px 24px 12px;
+  flex-shrink: 0;
+}
+
+.note-picker-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.note-picker-preview {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  padding: 6px 10px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  word-break: break-word;
+  max-height: 50px;
+  overflow-y: auto;
+}
+
+.note-picker-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 24px 24px;
+  scroll-behavior: smooth;
+}
+
+.np-bucket {
+  margin-bottom: 4px;
+}
+
+.np-bucket-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid var(--teal-subtle);
+  transition: background var(--transition);
+}
+
+.np-bucket-header:hover {
+  background: var(--gray-50);
+}
+
+.np-bucket-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal-deep);
+  flex: 1;
+}
+
+.np-bucket-count {
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--teal-subtle);
+  color: var(--teal-deep);
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-right: 8px;
+}
+
+.np-bucket-chevron {
+  font-size: 0.7rem;
+  color: var(--gray-400);
+  transition: transform 0.2s ease;
+}
+
+.np-bucket.open > .np-bucket-header .np-bucket-chevron {
+  transform: rotate(90deg);
+}
+
+.np-bucket-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+
+.np-bucket.open > .np-bucket-content {
+  max-height: 5000px;
+}
+
+.np-project {
+  margin: 4px 0 4px 12px;
+}
+
+.np-project-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  gap: 8px;
+  transition: background var(--transition);
+}
+
+.np-project-row:hover {
+  background: var(--gray-50);
+}
+
+.np-project-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.np-project-task-count {
+  font-size: 0.72rem;
+  color: var(--gray-400);
+  margin-right: 4px;
+}
+
+.np-assign-btn {
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-family: var(--font);
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid var(--teal-light);
+  background: var(--white);
+  color: var(--teal-deep);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.np-assign-btn:hover {
+  background: var(--teal-wash);
+}
+
+.np-assign-btn.disabled {
+  border-color: var(--gray-200);
+  color: var(--gray-300);
+  cursor: default;
+  pointer-events: none;
+}
+
+.np-expand-btn {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-family: var(--font);
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.np-expand-btn:hover {
+  border-color: var(--gray-400);
+  color: var(--gray-700);
+}
+
+.np-expand-chevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.np-project.tasks-open > .np-project-row .np-expand-chevron {
+  transform: rotate(90deg);
+}
+
+.np-task-list {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+  margin-left: 16px;
+}
+
+.np-project.tasks-open > .np-task-list {
+  max-height: 3000px;
+}
+
+.np-task-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  margin: 3px 0;
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  gap: 8px;
+  transition: background var(--transition);
+}
+
+.np-task-row:hover {
+  background: var(--gray-50);
+}
+
+.np-task-name {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--gray-700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-task-energy {
+  flex-shrink: 0;
+}
+
+/* ============================================
+   TOAST NOTIFICATION
+   ============================================ */
+.toast-notification {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.toast-notification.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* ============================================
@@ -1603,6 +1951,18 @@ body {
   .project-detail-panel {
     max-height: 90vh;
   }
+
+  .note-picker-overlay {
+    padding: 20px 12px;
+  }
+
+  .note-picker-modal {
+    max-height: 90vh;
+  }
+
+  .inbox-choice-modal {
+    max-width: 300px;
+  }
 }
 
 @media (max-width: 375px) {
@@ -1852,6 +2212,37 @@ body.dark-mode .assign-modal {
 body.dark-mode .bottom-tabs {
   background: #1f2023;
   border-top-color: #2c2e33;
+}
+
+body.dark-mode .inbox-choice-modal,
+body.dark-mode .note-picker-modal {
+  background: #1f2023;
+}
+
+body.dark-mode .inbox-choice-text,
+body.dark-mode .note-picker-preview {
+  background: #25262b;
+}
+
+body.dark-mode .np-project-row,
+body.dark-mode .np-task-row {
+  background: #25262b;
+  border-color: #373a40;
+}
+
+body.dark-mode .np-assign-btn {
+  background: #25262b;
+  border-color: var(--teal-light);
+}
+
+body.dark-mode .np-expand-btn {
+  background: #25262b;
+  border-color: #373a40;
+}
+
+body.dark-mode .toast-notification {
+  background: #e4e5e7;
+  color: #1a1b1e;
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2112,7 +2503,7 @@ body.dark-mode .bottom-tabs {
   <div class="assign-modal">
     <button class="close-btn" id="closeAssignModal">&times;</button>
     <h3>Assign to Project</h3>
-    <div class="assign-item-preview" id="assignItemPreview"></div>
+    <input type="text" class="assign-item-preview" id="assignItemPreview">
     <ul class="assign-project-list" id="assignProjectList"></ul>
     <div class="assign-modal-footer" id="assignModalFooter">
       <button class="assign-create-trigger" onclick="event.stopPropagation(); document.getElementById('assignCreateForm').classList.toggle('active'); var inp = document.getElementById('assignNewProjectName'); if(inp) inp.focus();">+ Create New Project</button>
@@ -2132,6 +2523,32 @@ body.dark-mode .bottom-tabs {
     </div>
   </div>
 </div>
+
+<!-- Inbox Task/Note choice popup -->
+<div class="inbox-choice-overlay" id="inboxChoiceOverlay">
+  <div class="inbox-choice-modal">
+    <div class="inbox-choice-text" id="inboxChoiceText"></div>
+    <div class="inbox-choice-buttons">
+      <button class="inbox-choice-btn task-btn" id="inboxChoiceTask">Task</button>
+      <button class="inbox-choice-btn note-btn" id="inboxChoiceNote">Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Picker modal (Bucket → Project → Task) -->
+<div class="note-picker-overlay" id="notePickerOverlay">
+  <div class="note-picker-modal">
+    <div class="note-picker-header">
+      <button class="close-btn" id="closeNotePicker">&times;</button>
+      <h3>Attach Note To</h3>
+      <div class="note-picker-preview" id="notePickerPreview"></div>
+    </div>
+    <div class="note-picker-body" id="notePickerBody"></div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast-notification" id="toastNotification"></div>
 
 <!-- Project detail overlay -->
 <div class="project-detail-overlay" id="projectDetailOverlay">
@@ -2424,14 +2841,42 @@ function updateInboxBadge() {
   if (badge) badge.textContent = getInbox().length;
 }
 
-// Add inbox item
+// Add inbox item — show Task/Note choice popup
+let _pendingInboxText = '';
+
 document.getElementById('inboxInput').addEventListener('keydown', async e => {
   if (e.key === 'Enter' && e.target.value.trim()) {
-    await sb.from('inbox_items').insert({ text: e.target.value.trim() });
+    _pendingInboxText = e.target.value.trim();
     e.target.value = '';
-    await refreshData();
-    renderInbox();
-    updateInboxBadge();
+
+    // Show Task/Note choice popup
+    document.getElementById('inboxChoiceText').textContent = _pendingInboxText;
+    document.getElementById('inboxChoiceOverlay').classList.add('active');
+  }
+});
+
+// Task button — save to inbox as normal
+document.getElementById('inboxChoiceTask').addEventListener('click', async () => {
+  document.getElementById('inboxChoiceOverlay').classList.remove('active');
+  await sb.from('inbox_items').insert({ text: _pendingInboxText });
+  _pendingInboxText = '';
+  await refreshData();
+  renderInbox();
+  updateInboxBadge();
+});
+
+// Note button — open note picker
+document.getElementById('inboxChoiceNote').addEventListener('click', () => {
+  document.getElementById('inboxChoiceOverlay').classList.remove('active');
+  openNotePicker(_pendingInboxText);
+});
+
+// Close choice popup on backdrop click — return text to input
+document.getElementById('inboxChoiceOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('inboxChoiceOverlay')) {
+    document.getElementById('inboxChoiceOverlay').classList.remove('active');
+    document.getElementById('inboxInput').value = _pendingInboxText;
+    _pendingInboxText = '';
   }
 });
 
@@ -2449,7 +2894,7 @@ function openAssignModal(itemId) {
   const item = getInbox().find(i => i.id === itemId);
   if (!item) return;
 
-  document.getElementById('assignItemPreview').textContent = item.text;
+  document.getElementById('assignItemPreview').value = item.text;
 
   const projects = getProjects().filter(p => p.status === 'Active');
   const listEl = document.getElementById('assignProjectList');
@@ -2505,7 +2950,11 @@ async function assignInboxToProject(projectId) {
   const item = _inbox.find(i => i.id === assigningItemId);
   if (!item) return;
 
-  await sb.from('tasks').insert({ name: item.text, project_id: projectId, status: 'Next' });
+  // Use the (possibly edited) name from the input field
+  const nameInput = document.getElementById('assignItemPreview');
+  const taskName = (nameInput && nameInput.value.trim()) || item.text;
+
+  await sb.from('tasks').insert({ name: taskName, project_id: projectId, status: 'Next' });
   await sb.from('inbox_items').delete().eq('id', assigningItemId);
   assigningItemId = null;
   document.getElementById('assignModal').classList.remove('active');
@@ -2522,6 +2971,211 @@ document.getElementById('assignModal').addEventListener('click', e => {
     document.getElementById('assignModal').classList.remove('active');
   }
 });
+
+/* ============================================================
+   NOTE PICKER — Bucket → Project → Task drill-down
+   ============================================================ */
+
+let _noteText = '';
+let _npOpenBucket = null;
+let _npOpenProject = null;
+let _npAtTaskLevel = false;
+
+function openNotePicker(noteText) {
+  _noteText = noteText;
+  _npOpenBucket = null;
+  _npOpenProject = null;
+  _npAtTaskLevel = false;
+  document.getElementById('notePickerPreview').textContent = noteText;
+  renderNotePicker();
+  document.getElementById('notePickerOverlay').classList.add('active');
+}
+
+function closeNotePicker() {
+  document.getElementById('notePickerOverlay').classList.remove('active');
+  if (_noteText) {
+    document.getElementById('inboxInput').value = _noteText;
+  }
+  _noteText = '';
+}
+
+document.getElementById('closeNotePicker').addEventListener('click', closeNotePicker);
+
+document.getElementById('notePickerOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('notePickerOverlay')) {
+    closeNotePicker();
+  }
+});
+
+function renderNotePicker() {
+  const projects = getProjects().filter(p => p.status === 'Active');
+  const tasks = getTasks().filter(t => t.status !== 'Done');
+  const body = document.getElementById('notePickerBody');
+  let html = '';
+
+  BUCKETS.forEach(bucket => {
+    const bucketProjects = projects.filter(p => p.bucket === bucket);
+    if (!bucketProjects.length) return;
+
+    const isOpen = _npOpenBucket === bucket;
+
+    html += `<div class="np-bucket ${isOpen ? 'open' : ''}" data-bucket="${escHtml(bucket)}">`;
+    html += `<div class="np-bucket-header" onclick="npToggleBucket('${escHtml(bucket)}')">
+      <span class="np-bucket-name">${escHtml(bucket)}</span>
+      <span class="np-bucket-count">${bucketProjects.length}</span>
+      <span class="np-bucket-chevron">&#9654;</span>
+    </div>`;
+    html += `<div class="np-bucket-content">`;
+
+    bucketProjects.forEach(p => {
+      const projectTasks = tasks.filter(t => t.project_id === p.id);
+      const isTasksOpen = _npOpenProject === p.id;
+      const assignDisabled = _npAtTaskLevel ? 'disabled' : '';
+
+      html += `<div class="np-project ${isTasksOpen ? 'tasks-open' : ''}" data-project-id="${p.id}">`;
+      html += `<div class="np-project-row">
+        <span class="np-project-name">${escHtml(p.name)}</span>
+        <span class="np-project-task-count">${projectTasks.length} task${projectTasks.length !== 1 ? 's' : ''}</span>
+        <button class="np-assign-btn ${assignDisabled}" onclick="event.stopPropagation(); npAssignToProject('${p.id}')">Assign</button>
+        ${projectTasks.length ? `<button class="np-expand-btn" onclick="event.stopPropagation(); npToggleProjectTasks('${p.id}')"><span class="np-expand-chevron">&#9654;</span></button>` : ''}
+      </div>`;
+
+      html += `<div class="np-task-list">`;
+      projectTasks.forEach(t => {
+        html += `<div class="np-task-row">
+          <span class="np-task-name">${escHtml(t.name)}</span>
+          <span class="np-task-energy">${energyIcon(t.energy, 16)}</span>
+          <button class="np-assign-btn" onclick="event.stopPropagation(); npAssignToTask('${t.id}')">Assign</button>
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function npToggleBucket(bucket) {
+  if (_npOpenBucket === bucket) {
+    _npOpenBucket = null;
+    _npOpenProject = null;
+    _npAtTaskLevel = false;
+  } else {
+    _npOpenBucket = bucket;
+    _npOpenProject = null;
+    _npAtTaskLevel = false;
+  }
+  renderNotePicker();
+
+  if (_npOpenBucket) {
+    setTimeout(() => {
+      const bucketEl = document.querySelector(`.np-bucket[data-bucket="${CSS.escape(_npOpenBucket)}"]`);
+      if (bucketEl) {
+        npSmoothScrollIntoView(bucketEl.querySelector('.np-bucket-header'));
+      }
+    }, 50);
+  }
+}
+
+function npToggleProjectTasks(projectId) {
+  if (_npOpenProject === projectId) {
+    const projectEl = document.querySelector(`.np-project[data-project-id="${projectId}"]`);
+    _npOpenProject = null;
+    _npAtTaskLevel = false;
+    renderNotePicker();
+
+    setTimeout(() => {
+      const el = document.querySelector(`.np-project[data-project-id="${projectId}"]`);
+      if (el) npSmoothScrollIntoView(el);
+    }, 200);
+  } else {
+    _npOpenProject = projectId;
+    _npAtTaskLevel = true;
+    renderNotePicker();
+
+    setTimeout(() => {
+      const projectEl = document.querySelector(`.np-project[data-project-id="${projectId}"]`);
+      if (projectEl) npSmartScrollProject(projectEl);
+    }, 200);
+  }
+}
+
+function npSmoothScrollIntoView(el) {
+  if (!el) return;
+  const body = document.getElementById('notePickerBody');
+  const elRect = el.getBoundingClientRect();
+  const bodyRect = body.getBoundingClientRect();
+  if (elRect.top < bodyRect.top || elRect.bottom > bodyRect.bottom) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function npSmartScrollProject(projectEl) {
+  if (!projectEl) return;
+  const body = document.getElementById('notePickerBody');
+  const bodyRect = body.getBoundingClientRect();
+  const projectHeader = projectEl.querySelector('.np-project-row');
+  const taskList = projectEl.querySelector('.np-task-list');
+  if (!projectHeader || !taskList) return;
+
+  const headerRect = projectHeader.getBoundingClientRect();
+  const taskListRect = taskList.getBoundingClientRect();
+  const totalHeight = headerRect.height + taskListRect.height;
+  const availableHeight = bodyRect.height;
+
+  if (totalHeight <= availableHeight) {
+    const lastTask = taskList.lastElementChild;
+    if (lastTask) lastTask.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  } else {
+    projectHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+async function npAssignToProject(projectId) {
+  if (_npAtTaskLevel) return;
+  const project = getProjectById(projectId);
+  if (!project) return;
+
+  const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const separator = project.notes ? '\n\n' : '';
+  const updatedNotes = (project.notes || '') + separator + `[${timestamp}] ${_noteText}`;
+
+  await sb.from('projects').update({ notes: updatedNotes }).eq('id', projectId);
+  await refreshData();
+  document.getElementById('notePickerOverlay').classList.remove('active');
+  showToast(`Note added to ${project.name}`);
+  _noteText = '';
+}
+
+async function npAssignToTask(taskId) {
+  const task = getTasks().find(t => t.id === taskId);
+  if (!task) return;
+
+  const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const separator = task.notes ? '\n\n' : '';
+  const updatedNotes = (task.notes || '') + separator + `[${timestamp}] ${_noteText}`;
+
+  await sb.from('tasks').update({ notes: updatedNotes }).eq('id', taskId);
+  await refreshData();
+  const project = getProjectById(task.project_id);
+  const targetName = project ? `${task.name} (${project.name})` : task.name;
+  document.getElementById('notePickerOverlay').classList.remove('active');
+  showToast(`Note added to ${targetName}`);
+  _noteText = '';
+}
+
+/* Toast notification */
+function showToast(message, duration) {
+  duration = duration || 2500;
+  const toast = document.getElementById('toastNotification');
+  toast.textContent = message;
+  toast.classList.add('visible');
+  setTimeout(() => {
+    toast.classList.remove('visible');
+  }, duration);
+}
 
 /* ============================================================
    DO NEXT RENDERING
