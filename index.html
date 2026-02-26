@@ -3240,10 +3240,16 @@ document.getElementById('closeAssignModal').addEventListener('click', () => {
   document.getElementById('assignModal').classList.remove('active');
 });
 
+let _assignOverlayMouseDownTarget = null;
+document.getElementById('assignModal').addEventListener('mousedown', e => {
+  _assignOverlayMouseDownTarget = e.target;
+});
 document.getElementById('assignModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('assignModal')) {
-    document.getElementById('assignModal').classList.remove('active');
+  const overlay = document.getElementById('assignModal');
+  if (e.target === overlay && _assignOverlayMouseDownTarget === overlay) {
+    overlay.classList.remove('active');
   }
+  _assignOverlayMouseDownTarget = null;
 });
 
 /* ============================================================
@@ -3275,10 +3281,16 @@ function closeNotePicker() {
 
 document.getElementById('closeNotePicker').addEventListener('click', closeNotePicker);
 
+let _notePickerOverlayMouseDownTarget = null;
+document.getElementById('notePickerOverlay').addEventListener('mousedown', e => {
+  _notePickerOverlayMouseDownTarget = e.target;
+});
 document.getElementById('notePickerOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('notePickerOverlay')) {
+  const overlay = document.getElementById('notePickerOverlay');
+  if (e.target === overlay && _notePickerOverlayMouseDownTarget === overlay) {
     closeNotePicker();
   }
+  _notePickerOverlayMouseDownTarget = null;
 });
 
 document.getElementById('notePickerBackBtn').addEventListener('click', () => {
@@ -3820,11 +3832,15 @@ function renderProjects() {
     html += `<div class="bucket-tasks ${isOpen ? 'open' : ''}">`;
 
     bucketProjects.forEach(p => {
-      const count = getActiveTaskCount(p.id);
+      const allTasks = _tasks.filter(t => t.project_id === p.id);
+      const activeCount = allTasks.filter(t => t.status !== 'Done').length;
+      const doneCount = allTasks.filter(t => t.status === 'Done').length;
+      const totalCount = allTasks.length;
+      const progressStr = doneCount > 0 ? ` · ${doneCount}/${totalCount} done` : '';
       html += `
         <div class="project-card" onclick="openProjectDetail('${p.id}')">
           <span class="project-name">${escHtml(p.name)}</span>
-          <span class="project-task-count">${count} task${count !== 1 ? 's' : ''}</span>
+          <span class="project-task-count">${activeCount} task${activeCount !== 1 ? 's' : ''}${progressStr}</span>
         </div>
       `;
     });
@@ -3997,8 +4013,14 @@ async function deleteProject(projectId) {
   closeProjectDetail();
 }
 
+let _projectOverlayMouseDownTarget = null;
+document.getElementById('projectDetailOverlay').addEventListener('mousedown', e => {
+  _projectOverlayMouseDownTarget = e.target;
+});
 document.getElementById('projectDetailOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('projectDetailOverlay')) closeProjectDetail();
+  const overlay = document.getElementById('projectDetailOverlay');
+  if (e.target === overlay && _projectOverlayMouseDownTarget === overlay) closeProjectDetail();
+  _projectOverlayMouseDownTarget = null;
 });
 
 async function addTaskToProject(projectId) {
@@ -4050,6 +4072,8 @@ function projectNotesStartEdit(projectId) {
   display.style.display = 'none';
   textarea.style.display = '';
   textarea.focus();
+  // Move cursor to end of existing text
+  textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
 }
 
 async function projectNotesEndEdit(projectId) {
@@ -4117,11 +4141,6 @@ function renderOverloaded() {
         medCount: pTasks.filter(t => t.energy === 'Medium').length,
         highCount: pTasks.filter(t => t.energy === 'High').length,
         unassignedCount: pTasks.filter(t => !t.energy).length,
-        computerCount: pTasks.filter(t => t.context === 'Computer').length,
-        emailCount: pTasks.filter(t => t.context === 'Email').length,
-        meetingCount: pTasks.filter(t => t.context === 'Meeting').length,
-        errandCount: pTasks.filter(t => t.context === 'Errand').length,
-        readingCount: pTasks.filter(t => t.context === 'Reading').length,
       };
     }).sort((a, b) => b.taskCount - a.taskCount);
 
@@ -4142,20 +4161,12 @@ function renderOverloaded() {
             if (p.medCount) breakdown += `<span class="energy-count">${p.medCount}${energyIcon('Medium', 16)}</span>`;
             if (p.highCount) breakdown += `<span class="energy-count">${p.highCount}${energyIcon('High', 16)}</span>`;
             if (p.unassignedCount) breakdown += `<span class="energy-count">${p.unassignedCount}${energyIcon('', 16)}</span>`;
-
-            let ctxBreakdown = '';
-            if (p.computerCount) ctxBreakdown += `<span class="energy-count">${p.computerCount} 💻</span>`;
-            if (p.emailCount) ctxBreakdown += `<span class="energy-count">${p.emailCount} 📧</span>`;
-            if (p.meetingCount) ctxBreakdown += `<span class="energy-count">${p.meetingCount} 🤝</span>`;
-            if (p.errandCount) ctxBreakdown += `<span class="energy-count">${p.errandCount} 🚗</span>`;
-            if (p.readingCount) ctxBreakdown += `<span class="energy-count">${p.readingCount} 📖</span>`;
             return `
             <div class="overloaded-project-row">
               <span>${escHtml(p.name)}</span>
               <span class="task-count-group">
                 <span class="task-count">${p.taskCount}</span>
                 ${breakdown ? `<span class="energy-breakdown">${breakdown}</span>` : ''}
-                ${ctxBreakdown ? `<span class="energy-breakdown" style="border-left-color:var(--gray-200);">${ctxBreakdown}</span>` : ''}
               </span>
             </div>
           `}).join('')}
@@ -4472,6 +4483,8 @@ function notesStartEdit(taskId) {
   display.style.display = 'none';
   textarea.style.display = '';
   textarea.focus();
+  // Move cursor to end of existing text
+  textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
 }
 
 async function notesEndEdit(taskId) {
@@ -4490,10 +4503,14 @@ async function notesEndEdit(taskId) {
 }
 
 // Close via backdrop click
+let _taskOverlayMouseDownTarget = null;
+document.getElementById('taskDetailOverlay').addEventListener('mousedown', e => {
+  _taskOverlayMouseDownTarget = e.target;
+});
 document.getElementById('taskDetailOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('taskDetailOverlay')) {
-    closeTaskDetail();
-  }
+  const overlay = document.getElementById('taskDetailOverlay');
+  if (e.target === overlay && _taskOverlayMouseDownTarget === overlay) closeTaskDetail();
+  _taskOverlayMouseDownTarget = null;
 });
 
 /* ============================================================
