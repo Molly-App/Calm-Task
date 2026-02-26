@@ -1113,6 +1113,12 @@ body {
 
 .review-flow.active { display: block; }
 
+.review-pick-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .review-item-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
@@ -4025,7 +4031,8 @@ function renderReviewStep() {
       <div class="review-step-number">Step 3 of 3 — Pick Your Week</div>
       <div class="review-item-card" style="text-align:left;">
         <div class="item-text" style="text-align:center;margin-bottom:16px;">Choose 3-5 tasks that feel realistic this week.</div>
-        ${tasks.slice(0, 15).map(t => {
+        <div class="review-pick-list">
+        ${tasks.map(t => {
           const proj = projects.find(p => p.id === t.project_id);
           return `
             <div class="task-card review-pick-card" data-task-id="${t.id}" style="margin-bottom:4px;cursor:pointer;" onclick="this.classList.toggle('selected'); this.style.background = this.classList.contains('selected') ? 'var(--teal-wash)' : 'var(--white)'; this.style.borderColor = this.classList.contains('selected') ? 'var(--teal-light)' : 'var(--gray-200)';">
@@ -4041,6 +4048,7 @@ function renderReviewStep() {
             </div>
           `;
         }).join('')}
+        </div>
         <div style="text-align:center;margin-top:20px;">
           <button class="review-start-btn" onclick="finishReview()">Finish Review</button>
         </div>
