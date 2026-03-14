@@ -1106,12 +1106,14 @@ body {
 }
 
 .teaching-sub {
+  display: inline;
   font-size: 0.75rem;
   color: var(--gray-500);
 }
 
 .breakdown-pipe {
-  color: var(--gray-300);
+  display: inline;
+  color: var(--gray-400);
   margin: 0 2px;
 }
 
@@ -4069,7 +4071,7 @@ function openProjectDetail(projectId) {
         </select>
         ${project.bucket === 'Teaching' ? `
         <select class="task-status-select" id="newTaskOptContext" style="width:auto;">
-          <option value="">Teaching Context?</option>
+          <option value="">Optional Context?</option>
           <option value="Grading">✏️ Grading</option>
           <option value="Canvas">🌐 Canvas</option>
           <option value="Prep">🏗️ Prep</option>
