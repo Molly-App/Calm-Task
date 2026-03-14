@@ -1108,7 +1108,11 @@ body {
 .teaching-sub {
   font-size: 0.75rem;
   color: var(--gray-500);
-  margin-left: 2px;
+}
+
+.breakdown-pipe {
+  color: var(--gray-300);
+  margin: 0 2px;
 }
 
 /* ============================================
@@ -4279,17 +4283,20 @@ function renderOverloaded() {
         </div>
         <div class="bucket-tasks ${isOpen ? 'open' : ''}">
           ${sorted.map(p => {
-            let breakdown = '';
+            const groups = [];
             p.energyGroups.forEach(g => {
-              let sub = '';
+              let str = `${g.count}${energyIcon(g.energy, 16)}`;
               if (p.bucket === 'Teaching') {
-                if (g.grading) sub += ` ✏️${g.grading}`;
-                if (g.canvas)  sub += ` 🌐${g.canvas}`;
-                if (g.prep)    sub += ` 🏗️${g.prep}`;
+                const subs = [];
+                if (g.grading) subs.push(`${g.grading}✏️`);
+                if (g.canvas)  subs.push(`${g.canvas}🌐`);
+                if (g.prep)    subs.push(`${g.prep}🏗️`);
+                if (subs.length) str += `:<span class="teaching-sub"> ${subs.join(' ')}</span>`;
               }
-              breakdown += `<span class="energy-count">${g.count}${energyIcon(g.energy, 16)}${sub ? `<span class="teaching-sub">${sub}</span>` : ''}</span>`;
+              groups.push(str);
             });
-            if (p.unassignedCount) breakdown += `<span class="energy-count">${p.unassignedCount}${energyIcon('', 16)}</span>`;
+            if (p.unassignedCount) groups.push(`${p.unassignedCount}${energyIcon('', 16)}`);
+            const breakdown = groups.join(' <span class="breakdown-pipe">|</span> ');
             return `
             <div class="overloaded-project-row">
               <span>${escHtml(p.name)}</span>
@@ -4537,7 +4544,7 @@ function openTaskDetail(taskId) {
         </select>
       </div>
       <div class="task-detail-field" ${project && project.bucket === 'Teaching' ? '' : 'style="display:none;"'}>
-        <span class="task-detail-field-label">Teaching Context</span>
+        <span class="task-detail-field-label">Optional Context</span>
         <span id="taskDetailTeachingCtxIcon" style="flex-shrink:0;">${teachingContextIcon(task.opt_context)}</span>
         <select id="taskDetailTeachingCtx"
           onchange="saveTaskDetailField('${taskId}', 'opt_context', this.value); document.getElementById('taskDetailTeachingCtxIcon').innerHTML = teachingContextIcon(this.value);">
