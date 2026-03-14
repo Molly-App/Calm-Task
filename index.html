@@ -4291,23 +4291,23 @@ function renderOverloaded() {
           ${sorted.map(p => {
             const groups = [];
             p.energyGroups.forEach(g => {
-              let str = `<span style="color:var(--gray-400)">${g.count}</span> ${energyIcon(g.energy, 16)} `;
+              let str = `<span style="color:var(--gray-700)">${g.count}</span> ${energyIcon(g.energy, 16)} `;
               if (p.bucket === 'Teaching') {
                 const subs = [];
-                if (g.grading) subs.push(`<span style="color:var(--gray-400)">${g.grading}</span>✏️`);
-                if (g.canvas)  subs.push(`<span style="color:var(--gray-400)">${g.canvas}</span>🌐`);
-                if (g.prep)    subs.push(`<span style="color:var(--gray-400)">${g.prep}</span>🏗️`);
+                if (g.grading) subs.push(`<span style="color:var(--gray-700)">${g.grading}</span>✏️`);
+                if (g.canvas)  subs.push(`<span style="color:var(--gray-700)">${g.canvas}</span>🌐`);
+                if (g.prep)    subs.push(`<span style="color:var(--gray-700)">${g.prep}</span>🏗️`);
                 if (subs.length) str += `: <span class="teaching-sub">${subs.join(' ')}</span>`;
               }
               groups.push(str);
             });
             if (p.unassignedCount) {
-              let str = `<span style="color:var(--gray-400)">${p.unassignedCount}</span> ${energyIcon('', 16)} `;
+              let str = `<span style="color:var(--gray-700)">${p.unassignedCount}</span> ${energyIcon('', 16)} `;
               if (p.bucket === 'Teaching') {
                 const subs = [];
-                if (p.unassignedGrading) subs.push(`<span style="color:var(--gray-400)">${p.unassignedGrading}</span>✏️`);
-                if (p.unassignedCanvas)  subs.push(`<span style="color:var(--gray-400)">${p.unassignedCanvas}</span>🌐`);
-                if (p.unassignedPrep)    subs.push(`<span style="color:var(--gray-400)">${p.unassignedPrep}</span>🏗️`);
+                if (p.unassignedGrading) subs.push(`<span style="color:var(--gray-700)">${p.unassignedGrading}</span>✏️`);
+                if (p.unassignedCanvas)  subs.push(`<span style="color:var(--gray-700)">${p.unassignedCanvas}</span>🌐`);
+                if (p.unassignedPrep)    subs.push(`<span style="color:var(--gray-700)">${p.unassignedPrep}</span>🏗️`);
                 if (subs.length) str += `: <span class="teaching-sub">${subs.join(' ')}</span>`;
               }
               groups.push(str);
