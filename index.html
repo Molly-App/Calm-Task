@@ -1105,6 +1105,12 @@ body {
   color: var(--gray-400);
 }
 
+.teaching-sub {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-left: 2px;
+}
+
 /* ============================================
    WEEKLY REVIEW TAB
    ============================================ */
@@ -2516,6 +2522,12 @@ body.dark-mode .mobile-dark-toggle {
         <button class="context-filter" data-context="Errand">🚗 Errand</button>
         <button class="context-filter" data-context="Reading">📖 Reading</button>
       </div>
+      <div class="context-filters teaching-context-filters" id="teachingContextFilters" style="display:none;">
+        <button class="context-filter active" data-tctx="all">All</button>
+        <button class="context-filter" data-tctx="Grading">✏️ Grading</button>
+        <button class="context-filter" data-tctx="Canvas">🌐 Canvas</button>
+        <button class="context-filter" data-tctx="Prep">🏗️ Prep</button>
+      </div>
       <div id="doNextContent"></div>
     </div>
 
@@ -2538,6 +2550,12 @@ body.dark-mode .mobile-dark-toggle {
         <button class="context-filter" data-context="Meeting">🤝 Meeting</button>
         <button class="context-filter" data-context="Errand">🚗 Errand</button>
         <button class="context-filter" data-context="Reading">📖 Reading</button>
+      </div>
+      <div class="context-filters teaching-context-filters" id="waitingTeachingContextFilters" style="display:none;">
+        <button class="context-filter active" data-tctx="all">All</button>
+        <button class="context-filter" data-tctx="Grading">✏️ Grading</button>
+        <button class="context-filter" data-tctx="Canvas">🌐 Canvas</button>
+        <button class="context-filter" data-tctx="Prep">🏗️ Prep</button>
       </div>
       <div id="waitingContent"></div>
     </div>
@@ -2562,6 +2580,12 @@ body.dark-mode .mobile-dark-toggle {
         <button class="context-filter" data-context="Errand">🚗 Errand</button>
         <button class="context-filter" data-context="Reading">📖 Reading</button>
       </div>
+      <div class="context-filters teaching-context-filters" id="somedayTeachingContextFilters" style="display:none;">
+        <button class="context-filter active" data-tctx="all">All</button>
+        <button class="context-filter" data-tctx="Grading">✏️ Grading</button>
+        <button class="context-filter" data-tctx="Canvas">🌐 Canvas</button>
+        <button class="context-filter" data-tctx="Prep">🏗️ Prep</button>
+      </div>
       <div id="somedayContent"></div>
     </div>
 
@@ -2584,6 +2608,12 @@ body.dark-mode .mobile-dark-toggle {
         <button class="context-filter" data-context="Meeting">🤝 Meeting</button>
         <button class="context-filter" data-context="Errand">🚗 Errand</button>
         <button class="context-filter" data-context="Reading">📖 Reading</button>
+      </div>
+      <div class="context-filters teaching-context-filters" id="doneTeachingContextFilters" style="display:none;">
+        <button class="context-filter active" data-tctx="all">All</button>
+        <button class="context-filter" data-tctx="Grading">✏️ Grading</button>
+        <button class="context-filter" data-tctx="Canvas">🌐 Canvas</button>
+        <button class="context-filter" data-tctx="Prep">🏗️ Prep</button>
       </div>
       <div id="doneContent"></div>
     </div>
@@ -2859,6 +2889,18 @@ function contextIcon(ctx) {
   return `<span class="context-tag" title="${ctx}">${CONTEXT_ICONS[ctx]}</span>`;
 }
 
+const TEACHING_CONTEXT_OPTIONS = ['', 'Grading', 'Canvas', 'Prep'];
+const TEACHING_CONTEXT_ICONS = {
+  'Grading': '✏️',
+  'Canvas':  '🌐',
+  'Prep':    '🏗️',
+};
+
+function teachingContextIcon(ctx) {
+  if (!ctx || !TEACHING_CONTEXT_ICONS[ctx]) return '';
+  return `<span class="context-tag" title="${ctx}">${TEACHING_CONTEXT_ICONS[ctx]}</span>`;
+}
+
 function energyTag(level) {
   if (!level) return '';
   return `<span class="energy-tag ${level.toLowerCase()}">${energyIcon(level)} ${level}</span>`;
@@ -3055,9 +3097,9 @@ function renderCurrentTab() {
   switch (currentTab) {
     case 'inbox': renderInbox(); break;
     case 'donext': renderDoNext(); break;
-    case 'waiting': renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter); break;
-    case 'someday': renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter); break;
-    case 'done': renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter); break;
+    case 'waiting': renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter, waitingTeachingContextFilter); break;
+    case 'someday': renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter, somedayTeachingContextFilter); break;
+    case 'done': renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter, doneTeachingContextFilter); break;
     case 'projects': renderProjects(); break;
     case 'overloaded': renderOverloaded(); break;
     case 'review': /* static until started */ break;
@@ -3497,6 +3539,15 @@ document.getElementById('contextFilters').addEventListener('click', e => {
   renderDoNext();
 });
 
+document.getElementById('teachingContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  teachingContextFilter = btn.dataset.tctx;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDoNext();
+});
+
 // Track which Do Next buckets are open (expanded by default)
 const openBuckets = new Set(BUCKETS);
 
@@ -3518,9 +3569,18 @@ function renderDoNext() {
   let filtered = energyFilter === 'all' ? tasks : tasks.filter(t => t.energy === energyFilter);
   if (contextFilter !== 'all') filtered = filtered.filter(t => t.context === contextFilter);
 
+  const teachingProjectIds = new Set(projects.filter(p => p.bucket === 'Teaching').map(p => p.id));
+  const hasTeachingTasks = filtered.some(t => teachingProjectIds.has(t.project_id));
+  document.getElementById('teachingContextFilters').style.display = hasTeachingTasks ? '' : 'none';
+  if (!hasTeachingTasks) teachingContextFilter = 'all';
+
+  if (teachingContextFilter !== 'all') {
+    filtered = filtered.filter(t => teachingProjectIds.has(t.project_id) && t.opt_context === teachingContextFilter);
+  }
+
   if (!filtered.length) {
     let emptyMsg = 'No active tasks yet. Add some from the Projects tab.';
-    if (energyFilter !== 'all' || contextFilter !== 'all') {
+    if (energyFilter !== 'all' || contextFilter !== 'all' || teachingContextFilter !== 'all') {
       emptyMsg = 'No tasks match the current filters.';
     }
     container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
@@ -3557,6 +3617,7 @@ function renderDoNext() {
               <div class="task-name">${escHtml(task.name)}</div>
               ${energyIcon(task.energy, 20)}
               ${contextIcon(task.context)}
+              ${teachingContextIcon(task.opt_context)}
             </div>
             <div class="task-meta">
               <span class="task-project-tag">${proj ? escHtml(proj.name) : ''}</span>
@@ -3612,6 +3673,10 @@ let doneEnergyFilter = 'all';
 let waitingContextFilter = 'all';
 let somedayContextFilter = 'all';
 let doneContextFilter = 'all';
+let teachingContextFilter = 'all';
+let waitingTeachingContextFilter = 'all';
+let somedayTeachingContextFilter = 'all';
+let doneTeachingContextFilter = 'all';
 
 // Collapsible bucket state per status view (all expanded by default)
 const openWaitingBuckets = new Set(BUCKETS);
@@ -3637,7 +3702,7 @@ document.getElementById('waitingEnergyFilters').addEventListener('click', e => {
   waitingEnergyFilter = btn.dataset.energy;
   e.currentTarget.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter);
+  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter, waitingTeachingContextFilter);
 });
 
 document.getElementById('waitingContextFilters').addEventListener('click', e => {
@@ -3646,7 +3711,16 @@ document.getElementById('waitingContextFilters').addEventListener('click', e => 
   waitingContextFilter = btn.dataset.context;
   e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter);
+  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter, waitingTeachingContextFilter);
+});
+
+document.getElementById('waitingTeachingContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  waitingTeachingContextFilter = btn.dataset.tctx;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStatusView('Waiting', 'waitingContent', waitingEnergyFilter, waitingContextFilter, waitingTeachingContextFilter);
 });
 
 document.getElementById('somedayEnergyFilters').addEventListener('click', e => {
@@ -3655,7 +3729,7 @@ document.getElementById('somedayEnergyFilters').addEventListener('click', e => {
   somedayEnergyFilter = btn.dataset.energy;
   e.currentTarget.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter);
+  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter, somedayTeachingContextFilter);
 });
 
 document.getElementById('somedayContextFilters').addEventListener('click', e => {
@@ -3664,7 +3738,16 @@ document.getElementById('somedayContextFilters').addEventListener('click', e => 
   somedayContextFilter = btn.dataset.context;
   e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter);
+  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter, somedayTeachingContextFilter);
+});
+
+document.getElementById('somedayTeachingContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  somedayTeachingContextFilter = btn.dataset.tctx;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStatusView('Someday', 'somedayContent', somedayEnergyFilter, somedayContextFilter, somedayTeachingContextFilter);
 });
 
 document.getElementById('doneEnergyFilters').addEventListener('click', e => {
@@ -3673,7 +3756,7 @@ document.getElementById('doneEnergyFilters').addEventListener('click', e => {
   doneEnergyFilter = btn.dataset.energy;
   e.currentTarget.querySelectorAll('.energy-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter);
+  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter, doneTeachingContextFilter);
 });
 
 document.getElementById('doneContextFilters').addEventListener('click', e => {
@@ -3682,10 +3765,19 @@ document.getElementById('doneContextFilters').addEventListener('click', e => {
   doneContextFilter = btn.dataset.context;
   e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter);
+  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter, doneTeachingContextFilter);
 });
 
-function renderStatusView(status, containerId, energyFilter, contextFilter) {
+document.getElementById('doneTeachingContextFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.context-filter');
+  if (!btn) return;
+  doneTeachingContextFilter = btn.dataset.tctx;
+  e.currentTarget.querySelectorAll('.context-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStatusView('Done', 'doneContent', doneEnergyFilter, doneContextFilter, doneTeachingContextFilter);
+});
+
+function renderStatusView(status, containerId, energyFilter, contextFilter, teachingCtxFilter) {
   let tasks = getTasks().filter(t => t.status === status);
   const projects = getProjects();
   const container = document.getElementById(containerId);
@@ -3698,6 +3790,18 @@ function renderStatusView(status, containerId, energyFilter, contextFilter) {
 
   let filtered = energyFilter === 'all' ? tasks : tasks.filter(t => t.energy === energyFilter);
   if (contextFilter && contextFilter !== 'all') filtered = filtered.filter(t => t.context === contextFilter);
+
+  const teachingProjectIds = new Set(projects.filter(p => p.bucket === 'Teaching').map(p => p.id));
+  const hasTeachingTasks = filtered.some(t => teachingProjectIds.has(t.project_id));
+  const teachingFilterId = status === 'Waiting' ? 'waitingTeachingContextFilters' : status === 'Someday' ? 'somedayTeachingContextFilters' : 'doneTeachingContextFilters';
+  const teachingEl = document.getElementById(teachingFilterId);
+  if (teachingEl) {
+    teachingEl.style.display = hasTeachingTasks ? '' : 'none';
+  }
+
+  if (teachingCtxFilter && teachingCtxFilter !== 'all') {
+    filtered = filtered.filter(t => teachingProjectIds.has(t.project_id) && t.opt_context === teachingCtxFilter);
+  }
 
   if (!filtered.length) {
     const emptyMsg = status === 'Done'
@@ -3741,6 +3845,7 @@ function renderStatusView(status, containerId, energyFilter, contextFilter) {
               <div class="task-name ${status === 'Done' ? 'done' : ''}">${escHtml(task.name)}</div>
               ${energyIcon(task.energy, 20)}
               ${contextIcon(task.context)}
+              ${teachingContextIcon(task.opt_context)}
             </div>
             <div class="task-meta">
               <span class="task-project-tag">${proj ? escHtml(proj.name) : ''}</span>
@@ -3913,6 +4018,7 @@ function openProjectDetail(projectId) {
               <div class="task-name ${t.status === 'Done' ? 'done' : ''}">${escHtml(t.name)}</div>
               ${energyIcon(t.energy, 20)}
               ${contextIcon(t.context)}
+              ${teachingContextIcon(t.opt_context)}
             </div>
           </div>
           <select class="task-status-select" onclick="event.stopPropagation()" onchange="changeTaskStatusFromDetail('${t.id}', this.value, '${projectId}')">
@@ -3957,6 +4063,14 @@ function openProjectDetail(projectId) {
           <option value="Errand">🚗 Errand</option>
           <option value="Reading">📖 Reading</option>
         </select>
+        ${project.bucket === 'Teaching' ? `
+        <select class="task-status-select" id="newTaskOptContext" style="width:auto;">
+          <option value="">Teaching Context?</option>
+          <option value="Grading">✏️ Grading</option>
+          <option value="Canvas">🌐 Canvas</option>
+          <option value="Prep">🏗️ Prep</option>
+        </select>
+        ` : ''}
         <button class="add-task-btn" id="addTaskBtn" onclick="addTaskToProject('${projectId}')" disabled>Add</button>
       </div>
     </div>
@@ -4032,7 +4146,8 @@ async function addTaskToProject(projectId) {
 
   const energy = energySel.value;
   const context = contextSel.value;
-  await sb.from('tasks').insert({ name, project_id: projectId, status: 'Next', energy: energy || null, context: context || null });
+  const optContext = document.getElementById('newTaskOptContext')?.value || null;
+  await sb.from('tasks').insert({ name, project_id: projectId, status: 'Next', energy: energy || null, context: context || null, opt_context: optContext || null });
   await refreshData();
   openProjectDetail(projectId); // re-render
 }
@@ -4137,9 +4252,17 @@ function renderOverloaded() {
       return {
         ...p,
         taskCount: pTasks.length,
-        lowCount: pTasks.filter(t => t.energy === 'Low').length,
-        medCount: pTasks.filter(t => t.energy === 'Medium').length,
-        highCount: pTasks.filter(t => t.energy === 'High').length,
+        energyGroups: ['Low', 'Medium', 'High'].map(energy => {
+          const eTasks = pTasks.filter(t => t.energy === energy);
+          if (!eTasks.length) return null;
+          return {
+            energy,
+            count: eTasks.length,
+            grading: eTasks.filter(t => t.opt_context === 'Grading').length,
+            canvas:  eTasks.filter(t => t.opt_context === 'Canvas').length,
+            prep:    eTasks.filter(t => t.opt_context === 'Prep').length,
+          };
+        }).filter(Boolean),
         unassignedCount: pTasks.filter(t => !t.energy).length,
       };
     }).sort((a, b) => b.taskCount - a.taskCount);
@@ -4157,9 +4280,15 @@ function renderOverloaded() {
         <div class="bucket-tasks ${isOpen ? 'open' : ''}">
           ${sorted.map(p => {
             let breakdown = '';
-            if (p.lowCount) breakdown += `<span class="energy-count">${p.lowCount}${energyIcon('Low', 16)}</span>`;
-            if (p.medCount) breakdown += `<span class="energy-count">${p.medCount}${energyIcon('Medium', 16)}</span>`;
-            if (p.highCount) breakdown += `<span class="energy-count">${p.highCount}${energyIcon('High', 16)}</span>`;
+            p.energyGroups.forEach(g => {
+              let sub = '';
+              if (p.bucket === 'Teaching') {
+                if (g.grading) sub += ` ✏️${g.grading}`;
+                if (g.canvas)  sub += ` 🌐${g.canvas}`;
+                if (g.prep)    sub += ` 🏗️${g.prep}`;
+              }
+              breakdown += `<span class="energy-count">${g.count}${energyIcon(g.energy, 16)}${sub ? `<span class="teaching-sub">${sub}</span>` : ''}</span>`;
+            });
             if (p.unassignedCount) breakdown += `<span class="energy-count">${p.unassignedCount}${energyIcon('', 16)}</span>`;
             return `
             <div class="overloaded-project-row">
@@ -4271,6 +4400,7 @@ function renderReviewStep() {
                   <div class="task-name">${escHtml(t.name)}</div>
                   ${energyIcon(t.energy, 20)}
                   ${contextIcon(t.context)}
+                  ${teachingContextIcon(t.opt_context)}
                 </div>
                 <div class="task-meta">
                   <span class="task-project-tag">${proj ? escHtml(proj.name) : ''}</span>
@@ -4404,6 +4534,14 @@ function openTaskDetail(taskId) {
         <span id="taskDetailContextIcon" style="flex-shrink:0;">${contextIcon(task.context)}</span>
         <select id="taskDetailContext" onchange="saveTaskDetailField('${taskId}', 'context', this.value); document.getElementById('taskDetailContextIcon').innerHTML = contextIcon(this.value);">
           ${CONTEXT_OPTIONS.map(c => `<option value="${c}" ${(task.context||'')===c?'selected':''}>${c || '—'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="task-detail-field" ${project && project.bucket === 'Teaching' ? '' : 'style="display:none;"'}>
+        <span class="task-detail-field-label">Teaching Context</span>
+        <span id="taskDetailTeachingCtxIcon" style="flex-shrink:0;">${teachingContextIcon(task.opt_context)}</span>
+        <select id="taskDetailTeachingCtx"
+          onchange="saveTaskDetailField('${taskId}', 'opt_context', this.value); document.getElementById('taskDetailTeachingCtxIcon').innerHTML = teachingContextIcon(this.value);">
+          ${TEACHING_CONTEXT_OPTIONS.map(c => `<option value="${c}" ${(task.opt_context||'')===c?'selected':''}>${c || '—'}</option>`).join('')}
         </select>
       </div>
     </div>
