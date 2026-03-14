@@ -4269,7 +4269,11 @@ function renderOverloaded() {
             prep:    eTasks.filter(t => t.opt_context === 'Prep').length,
           };
         }).filter(Boolean),
+        unassignedTasks: pTasks.filter(t => !t.energy),
         unassignedCount: pTasks.filter(t => !t.energy).length,
+        unassignedGrading: pTasks.filter(t => !t.energy && t.opt_context === 'Grading').length,
+        unassignedCanvas:  pTasks.filter(t => !t.energy && t.opt_context === 'Canvas').length,
+        unassignedPrep:    pTasks.filter(t => !t.energy && t.opt_context === 'Prep').length,
       };
     }).sort((a, b) => b.taskCount - a.taskCount);
 
@@ -4287,17 +4291,27 @@ function renderOverloaded() {
           ${sorted.map(p => {
             const groups = [];
             p.energyGroups.forEach(g => {
-              let str = `${g.count}${energyIcon(g.energy, 16)}`;
+              let str = `<span style="color:var(--gray-400)">${g.count}</span> ${energyIcon(g.energy, 16)} `;
               if (p.bucket === 'Teaching') {
                 const subs = [];
-                if (g.grading) subs.push(`${g.grading}✏️`);
-                if (g.canvas)  subs.push(`${g.canvas}🌐`);
-                if (g.prep)    subs.push(`${g.prep}🏗️`);
-                if (subs.length) str += `:<span class="teaching-sub">${subs.join(' ')}</span>`;
+                if (g.grading) subs.push(`<span style="color:var(--gray-400)">${g.grading}</span>✏️`);
+                if (g.canvas)  subs.push(`<span style="color:var(--gray-400)">${g.canvas}</span>🌐`);
+                if (g.prep)    subs.push(`<span style="color:var(--gray-400)">${g.prep}</span>🏗️`);
+                if (subs.length) str += `: <span class="teaching-sub">${subs.join(' ')}</span>`;
               }
               groups.push(str);
             });
-            if (p.unassignedCount) groups.push(`${p.unassignedCount}${energyIcon('', 16)}`);
+            if (p.unassignedCount) {
+              let str = `<span style="color:var(--gray-400)">${p.unassignedCount}</span> ${energyIcon('', 16)} `;
+              if (p.bucket === 'Teaching') {
+                const subs = [];
+                if (p.unassignedGrading) subs.push(`<span style="color:var(--gray-400)">${p.unassignedGrading}</span>✏️`);
+                if (p.unassignedCanvas)  subs.push(`<span style="color:var(--gray-400)">${p.unassignedCanvas}</span>🌐`);
+                if (p.unassignedPrep)    subs.push(`<span style="color:var(--gray-400)">${p.unassignedPrep}</span>🏗️`);
+                if (subs.length) str += `: <span class="teaching-sub">${subs.join(' ')}</span>`;
+              }
+              groups.push(str);
+            }
             const breakdown = groups.join(' <span class="breakdown-pipe">|</span> ');
             return `
             <div class="overloaded-project-row">
