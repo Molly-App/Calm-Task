@@ -566,8 +566,9 @@ body {
 .energy-tag.high { background: #e8e0f0; color: #5b4a7a; }
 
 .energy-brain {
-  display: inline-block;
+  display: inline;
   vertical-align: middle;
+  margin: 0;
   flex-shrink: 0;
   object-fit: contain;
 }
@@ -1097,9 +1098,8 @@ body {
 }
 
 .overloaded-project-row .energy-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  display: inline;
+  white-space: nowrap;
   font-size: 0.72rem;
   font-weight: 500;
   color: var(--gray-400);
@@ -1109,12 +1109,13 @@ body {
   display: inline;
   font-size: 0.75rem;
   color: var(--gray-500);
+  margin-left: 0;
 }
 
 .breakdown-pipe {
   display: inline;
+  margin: 0 4px;
   color: var(--gray-400);
-  margin: 0 2px;
 }
 
 /* ============================================
@@ -4293,7 +4294,7 @@ function renderOverloaded() {
                 if (g.grading) subs.push(`${g.grading}✏️`);
                 if (g.canvas)  subs.push(`${g.canvas}🌐`);
                 if (g.prep)    subs.push(`${g.prep}🏗️`);
-                if (subs.length) str += `:<span class="teaching-sub"> ${subs.join(' ')}</span>`;
+                if (subs.length) str += `:<span class="teaching-sub">${subs.join(' ')}</span>`;
               }
               groups.push(str);
             });
