@@ -4259,6 +4259,7 @@ async function reactivateProject(projectId) {
   await sb.from('projects').update({ status: 'Active' }).eq('id', projectId);
   await refreshData();
   renderProjects();
+  buildNav();
 }
 
 function confirmDeleteProjectInline(projectId, btn) {
