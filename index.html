@@ -4149,8 +4149,8 @@ function openProjectDetail(projectId) {
 
   panel.innerHTML = `
     <button class="close-btn" onclick="closeProjectDetail()">&times;</button>
-    <h3>${escHtml(project.name)}</h3>
-    <div class="project-detail-bucket">${project.bucket}</div>
+    <textarea class="task-detail-name-input" id="projectDetailName" rows="1" onblur="saveProjectDetailName('${projectId}')" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" style="font-size:1.15rem; font-weight:600; margin-bottom:2px;">${escHtml(project.name)}</textarea>
+    <div class="project-detail-bucket">${project.bucket}${project.created_at ? ' · Created ' + new Date(project.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}</div>
 
     <div class="project-detail-status">
       <div class="project-detail-status-label">Project Status</div>
@@ -4706,7 +4706,7 @@ function openTaskDetail(taskId) {
   panel.innerHTML = `
     <button class="close-btn" onclick="closeTaskDetail()">&times;</button>
 
-    <textarea class="task-detail-name-input" id="taskDetailName" rows="1" onblur="saveTaskDetailName('${taskId}')" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';">${escHtml(task.name)}</textarea>
+    <textarea class="task-detail-name-input" id="taskDetailName" rows="1" onblur="saveTaskDetailName('${taskId}')" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';">${escHtml(task.name)}</textarea>
     <div class="task-detail-project-label">${projectLabel}</div>
 
     <div class="task-detail-fields">
@@ -4755,7 +4755,7 @@ function openTaskDetail(taskId) {
       ${task.status === 'Done' && completedDate ? `<div class="task-detail-timestamp">Completed: ${completedDate}</div>` : ''}
     </div>
     <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--gray-100);">
-      <button class="btn-primary" onclick="closeTaskDetail()" style="width: 100%; padding: 14px; font-size: 0.95rem;">Finished</button>
+      <button class="btn-primary" onclick="saveAndCloseTaskDetail('${taskId}')" style="width: 100%; padding: 14px; font-size: 0.95rem;">Finished</button>
     </div>
   `;
 
@@ -4790,6 +4790,22 @@ async function saveTaskDetailName(taskId) {
 
   await sb.from('tasks').update({ name: newName }).eq('id', taskId);
   await refreshData();
+}
+
+async function saveAndCloseTaskDetail(taskId) {
+  await saveTaskDetailName(taskId);
+  closeTaskDetail();
+}
+
+async function saveProjectDetailName(projectId) {
+  const input = document.getElementById('projectDetailName');
+  if (!input) return;
+  const newName = input.value.trim();
+  if (!newName) return;
+  await sb.from('projects').update({ name: newName }).eq('id', projectId);
+  await refreshData();
+  renderProjects();
+  buildNav();
 }
 
 async function saveTaskDetailField(taskId, field, value) {
